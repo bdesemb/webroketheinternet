@@ -7,6 +7,7 @@
 #include <string>
 #include <sstream>
 #include <iostream>
+
 #include <vector>
 #include <stack>
 #include <array>
@@ -123,10 +124,6 @@ namespace model{
 		friend ostream & operator << (ostream& fichierOut, const Model& model);
 		friend istream & operator >> (istream& fichierIn, const Model& model);
 		void setPlateau(int tour, ref_ptr<Pion> pion1, ref_ptr<Pion> pion2, ref_ptr<Mur> tableauMurJoueur1[], ref_ptr<Mur> tableauMurJoueur2[]);
-		/*
-		Simule le plateau avec le nouveau mur placé pour vérifier s'il peut être placé.
-		Si origin, chemin possible vers x[0] sinon chemin possible vers
-		x[taille-1] */
 		bool peutPlacerMur(int pionX, int pionY, int murX, int murY, bool origin);
 	};
 }

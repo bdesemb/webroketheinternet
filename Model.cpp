@@ -291,8 +291,8 @@ bool Model::ajouterMur(){
 			return false;
 		}
 	}
-	if (!peutPlacerMur(pionAModifier()->getTableX(), pionAModifier()->getTableY(), 
-		murActuel->getTableX, murActuel->getTableY, this->getTour())) {
+	if (!peutPlacerMur(pionAModifier()->getTableX(), pionAModifier()->getTableY(),
+		murActuel->getTableX(), murActuel->getTableY(), this->getTour())) {
 		MyView::getInstance()->setStatut("IA : Nope", Vec4(1, 0, 0, 1));
 		return false;
 	}
