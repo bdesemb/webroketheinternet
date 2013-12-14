@@ -39,7 +39,7 @@ namespace model{
 		/* Methode utile à peutPlacerMur
 		coord est de la forme [x,y]
 		*/
-		vector<array<int, 2>> Model::getSuccessors(const array<int, 2> coord);
+		vector<array<int, 2>> Model::getSuccessors(const array<int, 2> coord, int murX, int murY);
 
 	public:
 		int getTaillePlateau()const{
