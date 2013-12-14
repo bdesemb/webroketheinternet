@@ -1,5 +1,4 @@
 #pragma once
-
 #include <osg/Referenced>
 
 using namespace osg;
