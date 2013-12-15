@@ -36,11 +36,12 @@ namespace model{
 		int tablePosition[17][17];		//Table contenant la position des murs et des pions sur le plateau
 		bool murMvt;					//Mode modification des murs
 		bool gameOver;					//Jeu terminé
+		int tailleReelle;
 
 		/* Methode utile à peutPlacerMur
 		coord est de la forme [x,y]
 		*/
-		vector<array<int, 2>> Model::getSuccessors(const array<int, 2> coord, int murX, int murY);
+		vector<array<int, 2>> Model::getSuccessors(const array<int, 2> coord, vector<vector<int>> &simuPlateau);
 
 	public:
 		int getTaillePlateau()const{
@@ -124,6 +125,6 @@ namespace model{
 		friend ostream & operator << (ostream& fichierOut, const Model& model);
 		friend istream & operator >> (istream& fichierIn, const Model& model);
 		void setPlateau(int tour, ref_ptr<Pion> pion1, ref_ptr<Pion> pion2, ref_ptr<Mur> tableauMurJoueur1[], ref_ptr<Mur> tableauMurJoueur2[]);
-		bool peutPlacerMur(int pionX, int pionY, int murX, int murY, bool origin);
+		bool peutPlacerMur();
 	};
 }

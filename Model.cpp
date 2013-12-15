@@ -18,6 +18,7 @@ namespace model {
 	//Constructeur du model
 	Model::Model(){
 		taillePlateau = 9;
+		tailleReelle = taillePlateau * 2 - 1;
 		pion1 = new Pion(6.5, 2.5, 8, 0);
 		pion2 = new Pion(6.5, 10.5, 8, 16);
 		tour = true;
@@ -298,9 +299,8 @@ namespace model {
 				return false;
 			}
 		}
-		if (!peutPlacerMur(pionAModifier()->getTableX(), pionAModifier()->getTableY(),
-			murActuel->getTableX(), murActuel->getTableY(), this->getTour())) {
-			MyView::getInstance()->setStatut("IA : Nope", Vec4(1, 0, 0, 1));
+		if (!peutPlacerMur()) {
+			MyView::getInstance()->setStatut("Vous bloquez votre adversaire", Vec4(1, 0, 0, 1));
 			return false;
 		}
 		murActuel->placerMur();		//On indique le mur comme placé
@@ -497,55 +497,80 @@ namespace model {
 		}
 	}
 
-	/*
-	Simule le plateau avec le nouveau mur placé pour vérifier s'il peut être placé.
-	Si origin, chemin possible vers x[0] sinon chemin possible vers
-	x[taille-1] */
-	bool Model::peutPlacerMur(int pionX, int pionY, int murX, int murY, bool origin) {
-		if (taillePlateau % 2 != 1) {
+
+	//Simule le plateau avec le nouveau mur placé pour vérifier s'il peut être placé.
+	bool Model::peutPlacerMur() {
+		cout << tailleReelle << endl;
+		if (tailleReelle % 2 != 1) {
 			throw new invalid_argument("La taille doit être impaire");
 		}
-		array<int, 2> coord = { pionX, pionY };
+		//copie de tablePosition
+		vector<vector<int>> simuTab(tailleReelle);
+		for (int i = 0; i < tailleReelle; i++) {
+			simuTab[i] = vector<int>(tailleReelle);
+			for (int j = 0; j < tailleReelle; j++) {
+				simuTab[i][j] = tablePosition[i][j];
+			}
+		}
+		//ajout dans notre copie du potentiel prochain mur
+		if (murAModifier()->getHorizontal()){
+			simuTab[murAModifier()->getTableX()][murAModifier()->getTableY()] = 3;
+			simuTab[murAModifier()->getTableX() - 1][murAModifier()->getTableY()] = 3;
+			simuTab[murAModifier()->getTableX() + 1][murAModifier()->getTableY()] = 3;
+		}
+		else{
+			simuTab[murAModifier()->getTableX()][murAModifier()->getTableY()] = 3;
+			simuTab[murAModifier()->getTableX()][murAModifier()->getTableY() - 1] = 3;
+			simuTab[murAModifier()->getTableX()][murAModifier()->getTableY() + 1] = 3;
+		}
+		//création de la pile qui contient toutes les cases atteignables
+		array<int, 2> coord = { pionAModifier()->getTableX(), pionAModifier()->getTableY() };
 		stack<array<int, 2>> pile;
 		pile.push(coord);
 		while (!pile.empty()) {
 			coord = pile.top();
-			pile.pop();
-			if (origin) {
-				if (coord.at(0) == 0)
+			//on vérifie si on a atteint un but (les lignes de fond sont y[0] et y[size-1] (merci Basile))
+			if (this->getTour()) {
+				if (coord.at(1) == 0)
 					return true;
 			}
 			else {
-				if (coord.at(0) == taillePlateau - 1)
+				if (coord.at(1) == tailleReelle - 1)
 					return true;
 			}
-			vector<array<int, 2>> succs = getSuccessors(coord, murX, murY);
+			//on va chercher tous les successeurs de notre
+			//position courante
+			vector<array<int, 2>> succs = getSuccessors(coord, simuTab);
+			//on ajoute tous les successeurs à la pile
 			for (int i = 0; i < succs.size(); i++) {
 				pile.push(succs.at(i));
 			}
+			//on supprime la case traitée
+			pile.pop();
 		}
 		return false;
 	}
 
-	vector<array<int, 2>> Model::getSuccessors(const array<int, 2> coord, int murX, int murY) {
+	//renvoie un vecteur de coordonnées de toutes les positions possibles du pion.
+	vector<array<int, 2>> Model::getSuccessors(const array<int, 2> coord, vector<vector<int>> &simuPlateau) {
 		vector<array<int, 2>> ret;
 		//s'il y a encore de la place à gauche et pas de mur (x min)
-		if (coord.at(0) > 1 && tablePosition[coord.at(0) - 1][coord.at(1)] != MUR) {
+		if (coord.at(0) > 1 && simuPlateau[coord.at(0) - 1][coord.at(1)] != MUR) {
 			array<int, 2> push = { coord.at(0) - 2, coord.at(1) };
 			ret.push_back(push);
 		}
 		//s'il y a encore de la place à droite et pas de mur (x max)
-		if (coord.at(0) < taillePlateau - 2 && tablePosition[coord.at(0) + 1][coord.at(1)] != MUR) {
+		if (coord.at(0) < tailleReelle - 2 && simuPlateau[coord.at(0) + 1][coord.at(1)] != MUR) {
 			array<int, 2> push = { coord.at(0) + 2, coord.at(1) + 1 };
 			ret.push_back(push);
 		}
 		//s'il y a encore de la place en haut et pas de mur (y min)
-		if (coord.at(1) > 1 && tablePosition[coord.at(0)][coord.at(1) - 1] != MUR) {
+		if (coord.at(1) > 1 && simuPlateau[coord.at(0)][coord.at(1) - 1] != MUR) {
 			array<int, 2> push = { coord.at(0), coord.at(1) - 2 };
 			ret.push_back(push);
 		}
 		//s'il y a encore de la place en bas et pas de mur (y max)
-		if (coord.at(0) < taillePlateau - 2 && tablePosition[coord.at(0)][coord.at(1) + 1] != MUR) {
+		if (coord.at(0) < tailleReelle - 2 && simuPlateau[coord.at(0)][coord.at(1) + 1] != MUR) {
 			array<int, 2> push = { coord.at(0), coord.at(1) + 2 };
 			ret.push_back(push);
 		}
