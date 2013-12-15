@@ -21,6 +21,7 @@ using namespace std;
 namespace model{
 	static const int MUR = 3;
 	static const int PION = 1;
+	static const int DEJA_VISITE = 5;
 	class Model
 	{
 	private:

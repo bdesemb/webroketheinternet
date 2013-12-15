@@ -523,7 +523,7 @@ namespace model {
 			simuTab[murAModifier()->getTableX()][murAModifier()->getTableY() - 1] = 3;
 			simuTab[murAModifier()->getTableX()][murAModifier()->getTableY() + 1] = 3;
 		}
-		//création de la pile qui contient toutes les cases atteignables
+		//création de la pile de coordonnées qui contient toutes les cases atteignables
 		array<int, 2> coord = { pionAModifier()->getTableX(), pionAModifier()->getTableY() };
 		stack<array<int, 2>> pile;
 		pile.push(coord);
@@ -539,10 +539,13 @@ namespace model {
 			//on va chercher tous les successeurs de notre
 			//position courante
 			vector<array<int, 2>> succs = getSuccessors(coord, simuTab);
-			//on ajoute tous les successeurs à la pile
+			//on ajoute dans la pile les successeurs non visités
 			for (int i = 0; i < succs.size(); i++) {
-				pile.push(succs.at(i));
+				if (simuTab.at(succs.at(i).at(0)).at(succs.at(i).at(0)) != DEJA_VISITE)
+					pile.push(succs.at(i));
 			}
+			//marque la case comme déjà traité
+			simuTab.at(coord.at(0)).at(coord.at(1)) = DEJA_VISITE;
 			//on supprime la case traitée
 			pile.pop();
 		}
@@ -553,22 +556,22 @@ namespace model {
 	vector<array<int, 2>> Model::getSuccessors(const array<int, 2> coord, vector<vector<int>> &simuPlateau) {
 		vector<array<int, 2>> ret;
 		//s'il y a encore de la place à gauche et pas de mur (x min)
-		if (coord.at(0) > 1 && simuPlateau[coord.at(0) - 1][coord.at(1)] != MUR) {
+		if (coord.at(0) > 1 && simuPlateau.at(coord.at(0) - 1).at(coord.at(1)) != MUR) {
 			array<int, 2> push = { coord.at(0) - 2, coord.at(1) };
 			ret.push_back(push);
 		}
 		//s'il y a encore de la place à droite et pas de mur (x max)
-		if (coord.at(0) < tailleReelle - 2 && simuPlateau[coord.at(0) + 1][coord.at(1)] != MUR) {
+		if (coord.at(0) < tailleReelle - 2 && simuPlateau.at(coord.at(0) + 1).at(coord.at(1)) != MUR) {
 			array<int, 2> push = { coord.at(0) + 2, coord.at(1) + 1 };
 			ret.push_back(push);
 		}
 		//s'il y a encore de la place en haut et pas de mur (y min)
-		if (coord.at(1) > 1 && simuPlateau[coord.at(0)][coord.at(1) - 1] != MUR) {
+		if (coord.at(1) > 1 && simuPlateau.at(coord.at(0)).at(coord.at(1) - 1) != MUR) {
 			array<int, 2> push = { coord.at(0), coord.at(1) - 2 };
 			ret.push_back(push);
 		}
 		//s'il y a encore de la place en bas et pas de mur (y max)
-		if (coord.at(0) < tailleReelle - 2 && simuPlateau[coord.at(0)][coord.at(1) + 1] != MUR) {
+		if (coord.at(1) < tailleReelle - 2 && simuPlateau.at(coord.at(0)).at(coord.at(1) + 1) != MUR) {
 			array<int, 2> push = { coord.at(0), coord.at(1) + 2 };
 			ret.push_back(push);
 		}
