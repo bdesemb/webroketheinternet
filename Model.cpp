@@ -531,13 +531,11 @@ namespace model {
 			coord = pile.top();
 			//on vérifie si on a atteint un but (les lignes de fond sont y[0] et y[size-1] (merci Basile))
 			if (this->getTour()) {
-				if (coord.at(1) == 0)
-					return true;
-			}
-			else {
 				if (coord.at(1) == tailleReelle - 1)
 					return true;
 			}
+			else if (coord.at(1) == 0)
+				return true;
 			//on va chercher tous les successeurs de notre
 			//position courante
 			vector<array<int, 2>> succs = getSuccessors(coord, simuTab);
