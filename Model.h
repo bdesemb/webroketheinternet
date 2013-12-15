@@ -43,6 +43,7 @@ namespace model{
 		coord est de la forme [x,y]
 		*/
 		vector<array<int, 2>> Model::getSuccessors(const array<int, 2> coord, vector<vector<int>> &simuPlateau);
+		ref_ptr<Pion> Model::lautrePion(ref_ptr<Pion> pion);
 
 	public:
 		int getTaillePlateau()const{
@@ -126,6 +127,6 @@ namespace model{
 		friend ostream & operator << (ostream& fichierOut, const Model& model);
 		friend istream & operator >> (istream& fichierIn, const Model& model);
 		void setPlateau(int tour, ref_ptr<Pion> pion1, ref_ptr<Pion> pion2, ref_ptr<Mur> tableauMurJoueur1[], ref_ptr<Mur> tableauMurJoueur2[]);
-		bool peutPlacerMur();
+		bool peutPlacerMur(ref_ptr<Pion>, bool origin);
 	};
 }
