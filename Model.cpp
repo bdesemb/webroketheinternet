@@ -299,11 +299,11 @@ namespace model {
 				return false;
 			}
 		}
-		if (!peutPlacerMur(pionAModifier(),false)) {
+		if (!peutPlacerMur(pionAModifier(),this->getTour())) {
 			MyView::getInstance()->setStatut("Vous bloquez votre adversaire", Vec4(1, 0, 0, 1));
 			return false;
 		}
-		if (!peutPlacerMur(lautrePion(pionAModifier()),true)) {
+		if (!peutPlacerMur(lautrePion(pionAModifier()), !this->getTour())) {
 			MyView::getInstance()->setStatut("Vous vous bloquez", Vec4(1, 0, 0, 1));
 			return false;
 		}
@@ -538,11 +538,11 @@ namespace model {
 			pile.pop();
 			//on vérifie si on a atteint un but (les lignes de fond sont y[0] et y[size-1] (merci Basile))
 			if (origin) {
-				if (coord.at(1) == tailleReelle-1){
+				if (coord.at(1) == 0){
 					return true;
 				}
 			}
-			else if (coord.at(1) == 0) {
+			else if (coord.at(1) == tailleReelle - 1) {
 				return true;
 			}
 			//on va chercher tous les successeurs de notre
