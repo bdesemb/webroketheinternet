@@ -501,27 +501,29 @@ namespace model {
 	//Simule le plateau avec le nouveau mur placé pour vérifier s'il peut être placé.
 	bool Model::peutPlacerMur() {
 		cout << tailleReelle << endl;
-		if (tailleReelle % 2 != 1) {
-			throw new invalid_argument("La taille doit être impaire");
+		if (pionAModifier()->getTableX() % 2 != 0 ||
+			pionAModifier()->getTableY() % 2 != 0) {
+			throw new invalid_argument("Le pion est sur une case MUR...");
 		}
 		//copie de tablePosition
 		vector<vector<int>> simuTab(tailleReelle);
 		for (int i = 0; i < tailleReelle; i++) {
-			simuTab[i] = vector<int>(tailleReelle);
+			simuTab.at(i) = vector<int>(tailleReelle);
 			for (int j = 0; j < tailleReelle; j++) {
-				simuTab[i][j] = tablePosition[i][j];
+				simuTab.at(i).at(j) = tablePosition[i][j];
 			}
 		}
 		//ajout dans notre copie du potentiel prochain mur
-		if (murAModifier()->getHorizontal()){
-			simuTab[murAModifier()->getTableX()][murAModifier()->getTableY()] = 3;
-			simuTab[murAModifier()->getTableX() - 1][murAModifier()->getTableY()] = 3;
-			simuTab[murAModifier()->getTableX() + 1][murAModifier()->getTableY()] = 3;
+		ref_ptr<Mur> murActuel = murAModifier();
+		if (murActuel->getHorizontal()){
+			simuTab[murActuel->getTableX()][murActuel->getTableY()] = 3;
+			simuTab[murActuel->getTableX() - 1][murActuel->getTableY()] = 3;
+			simuTab[murActuel->getTableX() + 1][murActuel->getTableY()] = 3;
 		}
 		else{
-			simuTab[murAModifier()->getTableX()][murAModifier()->getTableY()] = 3;
-			simuTab[murAModifier()->getTableX()][murAModifier()->getTableY() - 1] = 3;
-			simuTab[murAModifier()->getTableX()][murAModifier()->getTableY() + 1] = 3;
+			simuTab[murActuel->getTableX()][murActuel->getTableY()] = 3;
+			simuTab[murActuel->getTableX()][murActuel->getTableY() - 1] = 3;
+			simuTab[murActuel->getTableX()][murActuel->getTableY() + 1] = 3;
 		}
 		//création de la pile de coordonnées qui contient toutes les cases atteignables
 		array<int, 2> coord = { pionAModifier()->getTableX(), pionAModifier()->getTableY() };
@@ -544,7 +546,7 @@ namespace model {
 				if (simuTab.at(succs.at(i).at(0)).at(succs.at(i).at(0)) != DEJA_VISITE)
 					pile.push(succs.at(i));
 			}
-			//marque la case comme déjà traité
+			//marque la case comme déjà traitée
 			simuTab.at(coord.at(0)).at(coord.at(1)) = DEJA_VISITE;
 			//on supprime la case traitée
 			pile.pop();
@@ -562,7 +564,7 @@ namespace model {
 		}
 		//s'il y a encore de la place à droite et pas de mur (x max)
 		if (coord.at(0) < tailleReelle - 2 && simuPlateau.at(coord.at(0) + 1).at(coord.at(1)) != MUR) {
-			array<int, 2> push = { coord.at(0) + 2, coord.at(1) + 1 };
+			array<int, 2> push = { coord.at(0) + 2, coord.at(1) };
 			ret.push_back(push);
 		}
 		//s'il y a encore de la place en haut et pas de mur (y min)
